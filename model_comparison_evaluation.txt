@@ -1,0 +1,38 @@
+Model Performance Comparison Report
+=====================================
+
+Model 1: Dataset002_enhance_and_abnormality
+Model 2: Dataset003_enhance_and_abnormality_batchconfig (with batch configuration)
+
+OVERALL PERFORMANCE
+-------------------
+Model 1 - Dice: 0.7767 (77.67%)
+Model 2 - Dice: 0.7883 (78.83%)
+Improvement: +1.17%
+
+Model 1 - IoU: 0.7092 (70.92%)
+Model 2 - IoU: 0.7233 (72.33%)
+Improvement: +1.41%
+
+CLASS-WISE PERFORMANCE
+----------------------
+Class 1 (Main tissue):
+  Model 1 - Dice: 0.9867 (98.67%)
+  Model 2 - Dice: 0.9869 (98.69%)
+  Improvement: +0.02%
+
+Class 2:
+  Model 1 - Dice: 0.8108 (81.08%)
+  Model 2 - Dice: 0.8208 (82.08%)
+  Improvement: +1.00%
+
+Class 3:
+  Model 1 - Dice: 0.5326 (53.26%)
+  Model 2 - Dice: 0.5573 (55.73%)
+  Improvement: +2.47%
+
+CONCLUSION
+----------
+The model with batch configuration (Dataset003) consistently outperforms the baseline model (Dataset002) 
+across all metrics and classes. The most significant improvements are observed in Class 3 (+2.47% Dice score),
+while Class 1 shows minimal but positive improvement (+0.02% Dice score).
