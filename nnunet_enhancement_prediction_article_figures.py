@@ -21,6 +21,28 @@ from sklearn.metrics import confusion_matrix, classification_report
 pd.set_option('display.max_columns', None)
 
 # %%
+# Anonymisation flag - set to True to anonymize 'NHNN' as 'Internal\ncohort'
+ANONYMISE = True
+
+def anonymize_label(label):
+    """
+    Anonymize cohort labels if ANONYMISE is True.
+    Replaces 'NHNN' with 'Internal\ncohort' (with newline).
+    """
+    if ANONYMISE and label == 'NHNN':
+        return 'Internal\ncohort'
+    return label
+
+def anonymize_labels(labels):
+    """
+    Anonymize a list of cohort labels if ANONYMISE is True.
+    Replaces 'NHNN' with 'Internal\ncohort' (with newline).
+    """
+    if isinstance(labels, list):
+        return [anonymize_label(label) for label in labels]
+    return labels
+
+# %%
 # %% [markdown]
 # ## Bug Fixes and Optimizations
 # 
@@ -1211,7 +1233,7 @@ def create_missed_cases_image_figure(n_cases=6, include_filename=True, include_c
     green_cmap = ListedColormap(['none', 'green'])  # 'none' for transparent, 'green' for mask
     
     # Define data path
-    data_path = '/home/jruffle/Documents/seq-synth/data/'
+    data_path = '/media/jruffle/8TB/seq-synth/data/'
     
     # Process each case
     for i, case_row in enumerate(selected_cases):
@@ -1430,7 +1452,7 @@ def create_missed_cases_image_figure(n_cases=6, include_filename=True, include_c
         fig.add_artist(line)
     
     # UPDATED: Title NOT bold, NOT red
-    plt.suptitle('Test-set samples of cases missed by radiologists', 
+    plt.suptitle('Test-set samples of lesions missed by radiologists', 
                 fontsize=18, y=0.96)  # Removed color='red' and weight='bold'
     
     # Add explanation text at bottom
@@ -2245,6 +2267,7 @@ colors_pie = sns.color_palette('husl', n_colors=len(cohorts))
 cohort_counts = all_images['Cohort'].value_counts()
 sizes = [cohort_counts.get(c, 0) for c in cohorts if cohort_counts.get(c, 0) > 0]
 labels = [c for c in cohorts if cohort_counts.get(c, 0) > 0]
+labels = anonymize_labels(labels)  # Apply anonymization
 explode = [0.05] * len(labels)
 
 ax_pie1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140,
@@ -2290,13 +2313,16 @@ if 'Age' in all_images.columns and all_images['Age'].notna().sum() > 0:
     # Violin plot for age by cohort with sex split - USE COLORS FROM START AND END OF PALETTE
     # Get first and last colors from the palette for better contrast
     sex_colors = [colors_pie[3], colors_pie[7]]  # First and last colors for better contrast
-    sns.violinplot(x='Cohort', y='Age', data=all_images.dropna(subset=['Age']), 
+    sns.violinplot(x='Cohort', y='Age', data=all_images.dropna(subset=['Age']),
                    ax=ax_violin, hue='Sex', split=True, inner="quart", gap=.1,
                    palette=sex_colors)  # Use contrasting colors from start and end of palette
     ax_violin.set_title(f'd) Age distribution (data available {age_percent:.1f}%)', fontsize=16)  # INCREASED FONT SIZE
     ax_violin.tick_params(axis='x', rotation=30, labelsize=14)  # INCREASED FONT SIZE
     ax_violin.tick_params(axis='y', labelsize=14)  # INCREASED FONT SIZE
     ax_violin.set_xlabel('Study site', fontsize=14)  # INCREASED FONT SIZE
+    # Apply anonymization to x-tick labels
+    xticklabels = [anonymize_label(label.get_text()) for label in ax_violin.get_xticklabels()]
+    ax_violin.set_xticklabels(xticklabels)
     ax_violin.set_ylabel('Age (years)', fontsize=14)  # INCREASED FONT SIZE
     
     # Custom legend with full names and positioned at bottom right
@@ -2537,6 +2563,7 @@ ax2 = fig_pie2.add_subplot(gs[0, 1])
 trainval_cohort_counts = all_images[all_images['Partition'] == 'Train/Val']['Cohort'].value_counts()
 trainval_sizes = [trainval_cohort_counts.get(c, 0) for c in cohorts if trainval_cohort_counts.get(c, 0) > 0]
 trainval_labels = [c for c in cohorts if trainval_cohort_counts.get(c, 0) > 0]
+trainval_labels = anonymize_labels(trainval_labels)  # Apply anonymization
 
 ax1.pie(trainval_sizes, labels=trainval_labels, autopct='%1.1f%%', startangle=140,
         explode=[0.05] * len(trainval_labels), colors=colors_pie)
@@ -2547,6 +2574,7 @@ ax1.set_title(f'a) Train/Val Set Breakdown (n={trainval_size})')
 test_cohort_counts = all_images[all_images['Partition'] == 'Test']['Cohort'].value_counts()
 test_sizes = [test_cohort_counts.get(c, 0) for c in cohorts if test_cohort_counts.get(c, 0) > 0]
 test_labels = [c for c in cohorts if test_cohort_counts.get(c, 0) > 0]
+test_labels = anonymize_labels(test_labels)  # Apply anonymization
 explode = [0.05] * len(test_labels)
 
 ax2.pie(test_sizes, labels=test_labels, autopct='%1.1f%%', startangle=140,
@@ -2809,7 +2837,7 @@ def visualize_comparison_cases_nnunet(results_df, gt_path, pred_path, n_cases=5,
     green_cmap = ListedColormap(['none', 'green'])  # 'none' for transparent, 'green' for mask
     
     # Define the data path structure to match the original notebook
-    data_path = '/home/jruffle/Documents/seq-synth/data/'
+    data_path = '/media/jruffle/8TB/seq-synth/data/'
     
     # Process each case
     for i, case_row in enumerate(selected_cases):
@@ -2847,6 +2875,10 @@ def visualize_comparison_cases_nnunet(results_df, gt_path, pred_path, n_cases=5,
                     flair_path = os.path.join(images_path, f"{case_id}_0002.nii.gz")
                     t1ce_path = os.path.join(images_path, f"{case_id}_0003.nii.gz")
                     
+                    # Debug output to check T1CE path
+                    print(f"Looking for T1CE at: {t1ce_path}")
+                    print(f"T1CE file exists: {os.path.exists(t1ce_path)}")
+                    
                     # Load individual sequences if they exist
                     t1_img = nib.load(t1_path).get_fdata() if os.path.exists(t1_path) else None
                     t2_img = nib.load(t2_path).get_fdata() if os.path.exists(t2_path) else None
@@ -2854,6 +2886,7 @@ def visualize_comparison_cases_nnunet(results_df, gt_path, pred_path, n_cases=5,
                     t1ce_img = nib.load(t1ce_path).get_fdata() if os.path.exists(t1ce_path) else None
                     
                     print(f"Using nnUNet structure for {case_id}")
+                    print(f"Loaded images - T1: {t1_img is not None}, T2: {t2_img is not None}, FLAIR: {flair_img is not None}, T1CE: {t1ce_img is not None}")
                     
             except Exception as e:
                 print(f"Could not load sequences for {case_id}: {e}")
@@ -2920,10 +2953,13 @@ def visualize_comparison_cases_nnunet(results_df, gt_path, pred_path, n_cases=5,
             
             # Extract cohort and performance metrics
             cohort_name = case_row['Cohort']
+            # Apply anonymization - for Figure 3, use space instead of newline
+            if ANONYMISE and cohort_name == 'NHNN':
+                cohort_name = 'Internal cohort'
             dice_score = case_row['dice']
-            precision = case_row['precision'] 
+            precision = case_row['precision']
             recall = case_row['recall']
-            
+
             # Add case information (mimicking original format)
             newline = '\n'
             # axes[i, 0].set_ylabel(f"{case_id}{newline}Cohort: {cohort_name}{newline}{sort_metric}: {case_row[sort_metric]:.3f}", fontsize=10)
@@ -6130,7 +6166,7 @@ def create_expert_radiologist_failures_figure(results_df, gt_path, pred_path, n_
     label_cmap = ListedColormap(label_colors)
     
     # EXACT SAME data path as nnunet_figure3_alternate
-    data_path = '/home/jruffle/Documents/seq-synth/data/'
+    data_path = '/media/jruffle/8TB/seq-synth/data/'
     
     # Label scheme constants (EXACT SAME as nnunet_figure3_alternate)
     LABEL_BACKGROUND = 0
@@ -7122,7 +7158,211 @@ if 'sphericity' in et_cases.columns:
 # Import the updated calibration analysis
 import sys
 sys.path.append('/home/jruffle/Downloads/')
-from model_calibration_updated import model_calibration_analysis_updated, compute_confidence_metrics
+# from model_calibration_updated import model_calibration_analysis_updated, compute_confidence_metrics
+
+# Define calibration functions directly since the module was moved
+def compute_confidence_metrics(prob_map, gt_map, threshold=0.5):
+    """Compute confidence metrics from probability and ground truth maps"""
+    import numpy as np
+    
+    # Binarize predictions
+    pred_binary = (prob_map > threshold).astype(int)
+    
+    # Calculate metrics
+    tp = np.sum((pred_binary == 1) & (gt_map == 1))
+    fp = np.sum((pred_binary == 1) & (gt_map == 0))
+    tn = np.sum((pred_binary == 0) & (gt_map == 0))
+    fn = np.sum((pred_binary == 0) & (gt_map == 1))
+    
+    # Mean confidence for positive predictions
+    pos_mask = pred_binary == 1
+    mean_conf_pos = np.mean(prob_map[pos_mask]) if np.any(pos_mask) else 0
+    
+    # Mean confidence for negative predictions
+    neg_mask = pred_binary == 0
+    mean_conf_neg = np.mean(1 - prob_map[neg_mask]) if np.any(neg_mask) else 0
+    
+    return {
+        'tp': tp, 'fp': fp, 'tn': tn, 'fn': fn,
+        'mean_conf_pos': mean_conf_pos,
+        'mean_conf_neg': mean_conf_neg
+    }
+
+def process_single_case(args):
+    """Process a single case for calibration analysis"""
+    case_id, prob_path, gt_path, compute_conf_func = args
+    import numpy as np
+    import nibabel as nib
+    import os
+    
+    # Try different probability file naming patterns
+    prob_file_et = os.path.join(prob_path, f"{case_id}_et_probability.nii.gz")
+    prob_file_npz = os.path.join(prob_path, f"{case_id}.npz")
+    prob_file_nii = os.path.join(prob_path, f"{case_id}.nii.gz")
+    
+    # Load probability map - try different formats
+    if os.path.exists(prob_file_et):
+        # Use the enhancing tumor probability file directly
+        prob_nii = nib.load(prob_file_et)
+        prob_data = prob_nii.get_fdata()
+    elif os.path.exists(prob_file_npz):
+        # Load from npz file (nnUNet softmax output)
+        data = np.load(prob_file_npz)
+        # Assuming channel 3 is enhancing tumor (0: background, 1: NCR/NET, 2: ED, 3: ET)
+        prob_data = data['softmax'][3]  # Get enhancing tumor channel
+    elif os.path.exists(prob_file_nii):
+        # Load regular nifti file (might be multi-channel)
+        prob_nii = nib.load(prob_file_nii)
+        data = prob_nii.get_fdata()
+        if len(data.shape) == 4:
+            # Multi-channel, extract enhancing tumor channel
+            prob_data = data[..., 3] if data.shape[-1] > 3 else data[..., -1]
+        else:
+            # Single channel, use as is
+            prob_data = data
+    else:
+        return None
+    
+    # Load ground truth
+    gt_file = os.path.join(gt_path, f"{case_id}.nii.gz")
+    if not os.path.exists(gt_file):
+        return None
+        
+    gt_nii = nib.load(gt_file)
+    gt_data = gt_nii.get_fdata()
+    
+    # For enhancing tumor, we want label 3
+    # Convert ground truth to binary (1 for enhancing tumor, 0 for everything else)
+    gt_binary = (gt_data == 3).astype(int)
+    
+    # Flatten and collect values
+    prob_flat = prob_data.flatten()
+    gt_flat = gt_binary.flatten()
+    
+    # Sample if too large
+    if len(prob_flat) > 100000:
+        idx = np.random.choice(len(prob_flat), 100000, replace=False)
+        prob_flat = prob_flat[idx]
+        gt_flat = gt_flat[idx]
+    
+    # Compute confidence metrics using binary ground truth
+    metrics = compute_conf_func(prob_data, gt_binary)
+    metrics['case_id'] = case_id
+    
+    return {
+        'probs': prob_flat,
+        'gt': gt_flat,
+        'metrics': metrics
+    }
+
+def model_calibration_analysis_updated(results_df, prob_path, gt_path, pred_path):
+    """Generate calibration analysis plots with parallel processing"""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+    from sklearn.calibration import calibration_curve
+    from sklearn.metrics import brier_score_loss
+    import os
+    from multiprocessing import Pool, cpu_count
+    from tqdm import tqdm
+    
+    # Prepare arguments for parallel processing
+    case_ids = results_df['case_id'].tolist()
+    args_list = [(case_id, prob_path, gt_path, compute_confidence_metrics) for case_id in case_ids]
+    
+    # Process cases in parallel
+    print(f"Processing {len(case_ids)} cases using {cpu_count()} CPU cores...")
+    with Pool(processes=cpu_count()) as pool:
+        results = list(tqdm(
+            pool.imap(process_single_case, args_list),
+            total=len(args_list),
+            desc="Loading calibration data"
+        ))
+    
+    # Collect results
+    all_probs = []
+    all_gt = []
+    confidence_data = []
+    
+    for result in results:
+        if result is not None:
+            all_probs.extend(result['probs'])
+            all_gt.extend(result['gt'])
+            confidence_data.append(result['metrics'])
+    
+    # Convert to arrays
+    all_probs = np.array(all_probs)
+    all_gt = np.array(all_gt)
+    
+    # Clip probability values to [0, 1] range and check for issues
+    print(f"Probability range before clipping: [{np.min(all_probs):.4f}, {np.max(all_probs):.4f}]")
+    if np.min(all_probs) < 0 or np.max(all_probs) > 1:
+        print(f"WARNING: Probabilities outside [0,1] range detected. Clipping values.")
+    all_probs = np.clip(all_probs, 0, 1)
+    
+    # Create calibration plot
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    
+    # 1. Reliability diagram
+    ax = axes[0, 0]
+    fraction_pos, mean_pred = calibration_curve(all_gt, all_probs, n_bins=10)
+    ax.plot(mean_pred, fraction_pos, 's-', label='Model')
+    ax.plot([0, 1], [0, 1], 'k--', label='Perfect calibration')
+    ax.set_xlabel('Mean Predicted Probability')
+    ax.set_ylabel('Fraction of Positives')
+    ax.set_title('Reliability Diagram')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 2. Histogram of predictions
+    ax = axes[0, 1]
+    ax.hist(all_probs[all_gt == 0], bins=50, alpha=0.5, label='Negative', density=True)
+    ax.hist(all_probs[all_gt == 1], bins=50, alpha=0.5, label='Positive', density=True)
+    ax.set_xlabel('Predicted Probability')
+    ax.set_ylabel('Density')
+    ax.set_title('Distribution of Predictions')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 3. Confidence vs accuracy
+    ax = axes[1, 0]
+    conf_df = pd.DataFrame(confidence_data)
+    if len(conf_df) > 0:
+        accuracy = (conf_df['tp'] + conf_df['tn']) / (conf_df['tp'] + conf_df['fp'] + conf_df['tn'] + conf_df['fn'])
+        mean_conf = (conf_df['mean_conf_pos'] + conf_df['mean_conf_neg']) / 2
+        ax.scatter(mean_conf, accuracy, alpha=0.5)
+        ax.set_xlabel('Mean Confidence')
+        ax.set_ylabel('Accuracy')
+        ax.set_title('Confidence vs Accuracy')
+        ax.grid(True, alpha=0.3)
+    
+    # 4. Summary statistics
+    ax = axes[1, 1]
+    ax.axis('off')
+    
+    # Calculate Brier score
+    brier = brier_score_loss(all_gt, all_probs)
+    
+    # Calculate ECE (Expected Calibration Error)
+    ece = np.mean(np.abs(fraction_pos - mean_pred))
+    
+    stats_text = f"""Calibration Statistics:
+    
+Brier Score: {brier:.4f}
+ECE: {ece:.4f}
+Mean Prob (Pos): {np.mean(all_probs[all_gt == 1]):.4f}
+Mean Prob (Neg): {np.mean(all_probs[all_gt == 0]):.4f}
+Total Samples: {len(all_probs):,}
+Positive Samples: {np.sum(all_gt):,}
+Negative Samples: {len(all_gt) - np.sum(all_gt):,}"""
+    
+    ax.text(0.1, 0.5, stats_text, fontsize=10, verticalalignment='center',
+            fontfamily='monospace')
+    
+    plt.suptitle('Model Calibration Analysis', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    
+    return fig, conf_df
 
 # Use the updated function that uses actual probability maps
 def model_calibration_analysis():
@@ -8855,15 +9095,17 @@ def create_figure_5_sample_level_ADAPTED(results_df, figures_out):
             metric_means['f1'].append(all_values[6])
             
             # Format group names for better display
-            if len(group) > 15:  # If name is long, add line breaks
-                words = group.split()
+            # Apply anonymization first
+            display_group = anonymize_label(group)
+            if len(display_group) > 15:  # If name is long, add line breaks
+                words = display_group.split()
                 if len(words) > 2:
                     mid_point = len(words) // 2
                     formatted_name = ' '.join(words[:mid_point]) + '\n' + ' '.join(words[mid_point:])
                 else:
-                    formatted_name = group.replace(' ', '\n', 1)
+                    formatted_name = display_group.replace(' ', '\n', 1)
             else:
-                formatted_name = group
+                formatted_name = display_group
             group_names.append(formatted_name)
         
         # Radar plot setup with offset for countries
@@ -9129,7 +9371,7 @@ def create_figure_5_sample_level_ADAPTED(results_df, figures_out):
     ax_sex.grid(True, alpha=0.7, axis='y')  # Changed from 0.3 to 0.7
 
     # Add main title to the entire figure
-    plt.suptitle('Enhancement detection performance', fontsize=20, y=0.95)
+    plt.suptitle('Brain tumour enhancement detection performance', fontsize=20, y=0.95)
 
     plt.tight_layout()
 
@@ -9558,7 +9800,7 @@ def create_separate_best_worst_figures(results_df, groupby_column, performance_t
     groups = [g for g in groups if g != '']  # Remove empty groups
     
     # Define data path
-    data_path = '/home/jruffle/Documents/seq-synth/data/'
+    data_path = '/media/jruffle/8TB/seq-synth/data/'
     
     # Create green colormap for overlays
     green_cmap = ListedColormap(['none', 'green'])  # 'none' for transparent, 'green' for mask
