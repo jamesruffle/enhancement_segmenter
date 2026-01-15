@@ -121,7 +121,8 @@ nnUNetv2_predict \
     -f 0 1 2 3 4 \
     -tr nnUNetTrainer \
     -c 3d_fullres \
-    -p nnUNetResEncUNetPlans_80G
+    -p nnUNetResEncUNetPlans_80G \
+    -chk checkpoint_best.pth
 ```
 
 ### Output Interpretation

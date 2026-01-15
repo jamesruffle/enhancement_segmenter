@@ -108,6 +108,7 @@ def run_prediction(input_dir, output_dir, device="cuda", save_probabilities=Fals
         "-tr", TRAINER,
         "-c", CONFIGURATION,
         "-p", PLANS,
+        "-chk", "checkpoint_best.pth",
         "-device", device,
         "-npp", str(num_processes_preprocessing),
         "-nps", str(num_processes_segmentation),
