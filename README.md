@@ -23,6 +23,54 @@ Ruffle JK, Mohinta S, Pombo G, Biswas A, Campbell A, Davagnanam I, Doig D, Hamma
 - Trained on **11,089** brain MRI studies
 - Validated across glioma, meningioma, metastases, and post-resection cases in both adult and paediatric populations
 
+## Quick Start
+
+### 1. Install nnU-Net v2
+
+```bash
+pip install nnunetv2
+```
+
+### 2. Download Model Weights
+
+Download from Zenodo and extract:
+
+```bash
+# Download from Zenodo (link above) and extract to your nnUNet results folder
+unzip enhancement_segmenter_weights.zip -d /path/to/nnUNet_results/
+```
+
+### 3. Set Environment Variable
+
+```bash
+export nnUNet_results="/path/to/nnUNet_results"
+```
+
+### 4. Prepare Input Data
+
+Place your MRI sequences in a folder with this naming convention:
+- `{subject_id}_0000.nii.gz` → FLAIR
+- `{subject_id}_0001.nii.gz` → T1 (non-contrast)
+- `{subject_id}_0002.nii.gz` → T2
+
+### 5. Run Inference
+
+```bash
+nnUNetv2_predict \
+    -d Dataset003_enhance_and_abnormality_batchconfig \
+    -i /path/to/input_folder \
+    -o /path/to/output_folder \
+    -f 0 1 2 3 4 \
+    -tr nnUNetTrainer \
+    -c 3d_fullres \
+    -p nnUNetResEncUNetPlans_80G \
+    -chk checkpoint_best.pth
+```
+
+The output segmentation will contain: 0=background, 1=brain, 2=non-enhancing abnormality, **3=predicted enhancing tumour**.
+
+---
+
 ## Model Architecture
 
 - **Framework**: [nnU-Net v2](https://github.com/MIC-DKFZ/nnUNet)
