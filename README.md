@@ -73,7 +73,7 @@ After downloading, place the model files in the following structure:
 
 ```
 $nnUNet_results/
-└── Dataset500_EnhancementSegmenter/
+└── Dataset003_enhance_and_abnormality_batchconfig/
     └── nnUNetTrainer__nnUNetResEncUNetPlans_80G__3d_fullres/
         ├── fold_0/
         │   └── checkpoint_best.pth
@@ -115,7 +115,7 @@ input_folder/
 
 ```bash
 nnUNetv2_predict \
-    -d Dataset500_EnhancementSegmenter \
+    -d Dataset003_enhance_and_abnormality_batchconfig \
     -i /path/to/input_folder \
     -o /path/to/output_folder \
     -f 0 1 2 3 4 \
