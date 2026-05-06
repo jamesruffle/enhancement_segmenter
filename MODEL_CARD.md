@@ -72,7 +72,7 @@ The 4-class output mask can be used as input to downstream pipelines (radiomics 
 
 ## Bias, risks, and limitations
 
-- **The headline metric of interest is the enhancing-tumour class, where Dice is moderate.** Cross-validation Dice for class 3 (predicted enhancing tumour) is approximately 0.55, compared to 0.99 for brain parenchyma and 0.82 for non-enhancing abnormality. On the held-out test set, ~50% of patients have enhancing-tumour Dice > 0.7 and ~32% have Dice ≤ 0.3.
+- **The headline metric of interest is the enhancing-tumour class, where Dice is moderate.** On the held-out test set, voxel-wise Dice for the enhancing tumour class is 0.574 ± 0.319, compared to 0.987 ± 0.024 for normal brain and 0.821 ± 0.233 for non-enhancing abnormal tissue. Roughly half of test patients reach excellent enhancing-tumour Dice (≥ 0.7); roughly a quarter fall below acceptable detection (< 0.3).
 - **Training data was assembled from 10 international research datasets**, predominantly higher-field (1.5–3 T) clinical scanners with research-grade pulse sequences. Performance on out-of-distribution sequences (e.g., 7 T research scans, low-field portable scanners, motion-corrupted clinical scans) is unverified.
 - **Adult and paediatric subjects are both represented**, but paediatric coverage is smaller; expect higher uncertainty in paediatric subgroups, especially in rare tumour types.
 - **The model was trained on cases with known intracranial pathology.** Behaviour on entirely healthy scans is not formally evaluated — predicted enhancing tumour voxels may appear in some healthy scans and should not be interpreted as a positive finding.
@@ -128,7 +128,7 @@ A user-friendly Python wrapper is provided at [`predict.py`](predict.py).
 
 - **Checkpoint size**: ~821 MB per fold × 5 folds ≈ 4 GB total
 - **Inference time**: ~30–90 s per case on a 48 GB consumer/workstation GPU (5-fold ensemble, 3D fullres)
-- **Training time**: multi-week per fold on a single NVIDIA RTX 6000 Ada (48 GB)
+- **Training time**: approximately 2,000 hours (~83 days) for the released 5-fold ensemble on a single NVIDIA RTX 6000 Ada Generation workstation
 
 ## Evaluation
 
@@ -140,25 +140,44 @@ A user-friendly Python wrapper is provided at [`predict.py`](predict.py).
 
 ### Results
 
-| Metric | Value |
-|---|---|
-| Balanced accuracy (patient-level enhancement detection) | **83 %** |
-| Sensitivity | **91.5 %** |
-| Specificity | **74.4 %** |
-| Test-set Dice (enhancing tumour, fraction of patients exceeding threshold) | 76.8 % > 0.3; 67.5 % > 0.5; 50.2 % > 0.7 |
+All numbers below are for the held-out 1,109-patient test set, as reported in the paper.
 
-Cross-validation Dice per class (mean across the 5 training folds, reported by nnU-Net's internal validation):
+#### Patient-level detection of any enhancing tumour
 
-| Class | Cross-val Dice |
+| Metric | Value (mean ± SD) |
 |---|---|
-| Brain parenchyma | 0.99 |
-| Non-enhancing abnormality | 0.82 |
-| Predicted enhancing tumour | 0.55 |
-| (Foreground mean) | 0.79 |
+| Balanced accuracy | **0.830 ± 0.150** (83 %) |
+| Sensitivity (recall) | **0.915 ± 0.009** (91.5 %) |
+| Specificity | **0.744 ± 0.041** (74.4 %) |
+| Precision | 0.968 ± 0.006 |
+| F1 score | 0.941 ± 0.006 |
+| AUROC | 0.909 |
+
+The model outperformed a panel of 11 expert radiologists who each reviewed 100 randomly selected patients (radiologist mean balanced accuracy 0.698 ± 0.072, sensitivity 0.759 ± 0.076, specificity 0.647 ± 0.151).
+
+#### Volumetric agreement with ground-truth enhancement
+
+Predicted enhancement volume strongly correlated with ground-truth enhancement volume on the test set: **R² = 0.859**.
+
+#### Per-patient Dice on the held-out test set (enhancing tumour)
+
+| Threshold | Fraction of patients |
+|---|---|
+| Dice ≥ 0.3 (acceptable detection) | 76.8 % |
+| Dice ≥ 0.5 (good detection) | 67.5 % |
+| Dice ≥ 0.7 (excellent detection) | 50.2 % |
+
+#### Per-class voxel-wise segmentation metrics on the held-out test set
+
+| Class | Dice | Balanced accuracy | Precision | F1 |
+|---|---|---|---|---|
+| Normal brain | 0.987 ± 0.024 | 0.990 ± 0.013 | 0.992 ± 0.028 | 0.987 ± 0.024 |
+| Non-enhancing abnormal tissue | 0.821 ± 0.233 | 0.992 ± 0.098 | 0.844 ± 0.213 | 0.821 ± 0.233 |
+| Enhancing tumour | 0.574 ± 0.319 | 0.790 ± 0.168 | 0.581 ± 0.337 | 0.557 ± 0.329 |
 
 ## Environmental impact
 
-Training was carried out on NVIDIA RTX 6000 Ada GPUs (~300 W TDP). Estimated cumulative GPU-hours for the 5-fold ensemble are on the order of several hundred to ~1,000 GPU-hours, depending on data-loader throughput. Inference is comparatively cheap (a few minutes per case on the same hardware). Carbon impact has not been formally quantified; users are encouraged to share an inference container rather than retrain when possible.
+Training was carried out on a single NVIDIA RTX 6000 Ada Generation workstation (~300 W TDP). The released 5-fold ensemble took approximately 2,000 GPU-hours (~83 days of wall-clock time on this single workstation). Inference is comparatively cheap (~30–90 seconds per case on the same hardware). Carbon impact has not been formally quantified; users are encouraged to share an inference container rather than retrain when possible.
 
 ## Technical specifications
 
