@@ -54,6 +54,8 @@ Place your MRI sequences in a folder with this naming convention:
 - `{subject_id}_0001.nii.gz` → T1 (non-contrast)
 - `{subject_id}_0002.nii.gz` → T2
 
+> **Try it on a public dataset**: the [BraTS challenge](https://www.synapse.org/Synapse:syn53708126/wiki/626320) releases free, registration-only multi-modal brain tumour MRI (FLAIR, T1, T1c, T2). Use only FLAIR (`_0000`), T1 (`_0001`), and T2 (`_0002`) — drop T1c, since this model predicts enhancement from non-contrast sequences only.
+
 ### 5. Run Inference
 
 ```bash
