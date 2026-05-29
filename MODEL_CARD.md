@@ -151,7 +151,9 @@ All numbers below are for the held-out 1,109-patient test set, as reported in th
 | Specificity | **0.744 ± 0.041** (74.4 %) |
 | Precision | 0.968 ± 0.006 |
 | F1 score | 0.941 ± 0.006 |
-| AUROC | 0.909 |
+| AUROC | 0.928 |
+
+AUROC uses predicted enhancement volume as the per-patient score (the patient-level detection ROC reported in the paper).
 
 The model outperformed a panel of 11 expert radiologists who each reviewed 100 randomly selected patients (radiologist mean balanced accuracy 0.698 ± 0.072, sensitivity 0.759 ± 0.076, specificity 0.647 ± 0.151).
 
