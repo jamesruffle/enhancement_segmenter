@@ -1,5 +1,6 @@
 # Enhancement Segmenter
 
+[![Paper](https://img.shields.io/badge/Lancet%20Med%20Imaging-10.1016%2Fj.lanmit.2026.100012-00457C.svg)](https://doi.org/10.1016/j.lanmit.2026.100012)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.16650-b31b1b.svg)](https://arxiv.org/abs/2508.16650)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20055549.svg)](https://doi.org/10.5281/zenodo.20055549)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -8,13 +9,15 @@ Deep learning model for predicting brain tumour contrast enhancement from non-co
 
 ## Overview
 
-This repository contains the code and model weights for the paper:
+This repository contains the code and model weights for the paper, published in *The Lancet Medical Imaging & Theranostics*:
 
-**"Predicting brain tumour enhancement from non-contrast MR imaging with artificial intelligence"**
+**"Predicting brain tumour enhancement from non-contrast MRI with artificial intelligence: a multicohort, retrospective, diagnostic accuracy study"**
 
-Ruffle JK, Mohinta S, Pombo G, Biswas A, Campbell A, Davagnanam I, Doig D, Hamman A, Hyare H, Jabeen F, Lim E, Mallon D, Owen S, Wilkinson S, Brandner S, Nachev P.
+Ruffle JK, Mohinta S, Pombo G, Biswas A, Campbell A, Davagnanam I, Doig D, Hammam A, Hyare H, Jabeen F, Lim E, Mallon D, Owen S, Wilkinson S, Brandner S, Nachev P.
 
-[arXiv:2508.16650](https://arxiv.org/abs/2508.16650)
+*The Lancet Medical Imaging & Theranostics* 2026; **100012**. doi:[10.1016/j.lanmit.2026.100012](https://doi.org/10.1016/j.lanmit.2026.100012)
+
+Preprint: [arXiv:2508.16650](https://arxiv.org/abs/2508.16650)
 
 ### Key Results
 
@@ -44,7 +47,7 @@ Representative test-set cases that expert radiologists, when reviewing the non-c
 
 Model performance in detecting enhancing tumour from non-contrast sequences across (a) the entire cohort, (b) individual datasets, (c) pathologies, (d) countries of origin, (e) patient ages, and (f) patient sexes.
 
-Figures reproduced from the paper. Full captions and additional content are available in the [preprint PDF](https://arxiv.org/pdf/2508.16650).
+Figures reproduced from the paper. Full captions and additional content are available in the [published article](https://doi.org/10.1016/j.lanmit.2026.100012) (open access).
 
 ## Quick Start
 
@@ -337,11 +340,14 @@ enhancement_segmenter/
 If you use this code or model in your research, please cite:
 
 ```bibtex
-@article{ruffle2025predicting,
-  title={Predicting brain tumour enhancement from non-contrast MR imaging with artificial intelligence},
-  author={Ruffle, James K and Mohinta, Samia and Pombo, Guilherme and Biswas, Asthik and Campbell, Alan and Davagnanam, Indran and Doig, David and Hamman, Ahmed and Hyare, Harpreet and Jabeen, Farrah and Lim, Emma and Mallon, Dermot and Owen, Stephanie and Wilkinson, Sophie and Brandner, Sebastian and Nachev, Parashkev},
-  journal={arXiv preprint arXiv:2508.16650},
-  year={2025}
+@article{ruffle2026predicting,
+  title={Predicting brain tumour enhancement from non-contrast MRI with artificial intelligence: a multicohort, retrospective, diagnostic accuracy study},
+  author={Ruffle, James K and Mohinta, Samia and Pombo, Guilherme and Biswas, Asthik and Campbell, Alan and Davagnanam, Indran and Doig, David and Hammam, Ahmed and Hyare, Harpreet and Jabeen, Farrah and Lim, Emma and Mallon, Dermot and Owen, Stephanie and Wilkinson, Sophie and Brandner, Sebastian and Nachev, Parashkev},
+  journal={The Lancet Medical Imaging {\&} Theranostics},
+  pages={100012},
+  year={2026},
+  doi={10.1016/j.lanmit.2026.100012},
+  url={https://doi.org/10.1016/j.lanmit.2026.100012}
 }
 ```
 

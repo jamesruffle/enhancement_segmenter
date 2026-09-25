@@ -41,11 +41,12 @@ A 3D nnU-Net v2 model that predicts which regions of a brain tumour *would* enha
 | **License** | [Apache 2.0](LICENSE) |
 | **Code** | <https://github.com/jamesruffle/enhancement_segmenter> |
 | **Weights** | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20055549.svg)](https://doi.org/10.5281/zenodo.20055549) |
-| **Paper** | [arXiv:2508.16650](https://arxiv.org/abs/2508.16650) |
+| **Paper** | Predicting brain tumour enhancement from non-contrast MRI with artificial intelligence: a multicohort, retrospective, diagnostic accuracy study. *The Lancet Medical Imaging & Theranostics* 2026; 100012. [doi:10.1016/j.lanmit.2026.100012](https://doi.org/10.1016/j.lanmit.2026.100012) |
+| **Preprint** | [arXiv:2508.16650](https://arxiv.org/abs/2508.16650) |
 
 ### Authors
 
-Ruffle JK, Mohinta S, Pombo G, Biswas A, Campbell A, Davagnanam I, Doig D, Hamman A, Hyare H, Jabeen F, Lim E, Mallon D, Owen S, Wilkinson S, Brandner S, Nachev P.
+Ruffle JK, Mohinta S, Pombo G, Biswas A, Campbell A, Davagnanam I, Doig D, Hammam A, Hyare H, Jabeen F, Lim E, Mallon D, Owen S, Wilkinson S, Brandner S, Nachev P.
 
 ## Uses
 
@@ -199,16 +200,21 @@ The Python dependency manifest is in [`requirements.txt`](requirements.txt). Inf
 ## Citation
 
 ```bibtex
-@article{ruffle2025predicting,
-  title   = {Predicting brain tumour enhancement from non-contrast MR imaging with artificial intelligence},
+@article{ruffle2026predicting,
+  title   = {Predicting brain tumour enhancement from non-contrast MRI with
+             artificial intelligence: a multicohort, retrospective,
+             diagnostic accuracy study},
   author  = {Ruffle, James K and Mohinta, Samia and Pombo, Guilherme and
              Biswas, Asthik and Campbell, Alan and Davagnanam, Indran and
-             Doig, David and Hamman, Ahmed and Hyare, Harpreet and
+             Doig, David and Hammam, Ahmed and Hyare, Harpreet and
              Jabeen, Farrah and Lim, Emma and Mallon, Dermot and
              Owen, Stephanie and Wilkinson, Sophie and Brandner, Sebastian
              and Nachev, Parashkev},
-  journal = {arXiv preprint arXiv:2508.16650},
-  year    = {2025}
+  journal = {The Lancet Medical Imaging {\&} Theranostics},
+  pages   = {100012},
+  year    = {2026},
+  doi     = {10.1016/j.lanmit.2026.100012},
+  url     = {https://doi.org/10.1016/j.lanmit.2026.100012}
 }
 ```
 
@@ -222,5 +228,6 @@ James K. Ruffle, on behalf of the paper's author list. Open an issue at <https:/
 
 - Repository: <https://github.com/jamesruffle/enhancement_segmenter>
 - Pretrained weights (Zenodo): <https://doi.org/10.5281/zenodo.20055549>
+- Published article: <https://doi.org/10.1016/j.lanmit.2026.100012>
 - Preprint: <https://arxiv.org/abs/2508.16650>
 - Public dataset to try the model on: BraTS challenge — <https://www.synapse.org/Synapse:syn53708126/wiki/626320>

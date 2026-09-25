@@ -36,7 +36,8 @@
 #   - Folds: 5-fold cross-validation (0-4)
 #
 # Author: James K Ruffle
-# Paper: https://arxiv.org/abs/2508.16650
+# Paper: https://doi.org/10.1016/j.lanmit.2026.100012
+# Preprint: https://arxiv.org/abs/2508.16650
 #
 
 set -e  # Exit on error
